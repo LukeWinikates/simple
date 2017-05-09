@@ -22,14 +22,16 @@ instance MonadHttp IO where
 
 -- TODO: parse JSON, get the urls for each gif as a data structure (instead of printing the whole thing)
 giphySearch :: String -> IO ()
-giphySearch searchterms = do
-   res <- req GET
-    (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
-    NoReqBody
-    jsonResponse -- still expecting json, not parsing anything for now
-    ("q" =: (searchterms :: String) <>
-          "api_key" =: ("dc6zaTOxFJmzC"::String)) -- this part was like pulling teeth
-   print (responseBody res :: Value)
+giphySearch searchterms =
+  let options = ("q" =: (searchterms :: String) <>
+                          "api_key" =: ("dc6zaTOxFJmzC"::String)) in
+      do
+        res <- req GET
+          (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
+          NoReqBody
+          jsonResponse -- still expecting json, not parsing anything for now
+          options
+        print (responseBody res :: Value)
 
 
 
