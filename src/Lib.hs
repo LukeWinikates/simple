@@ -11,7 +11,7 @@ import Control.Exception (throwIO)
 import Network.HTTP.Req
 import Data.Aeson
 import Data.Monoid
-import Control.Monad (mzero)
+import Control.Monad (mzero) -- what is mzero?
 
 instance MonadHttp IO where
   handleHttpException = throwIO
@@ -25,7 +25,7 @@ data GiphyItem = GiphyItem {
 
 instance FromJSON GiphyItem where
  parseJSON (Object v) =
-    GiphyItem <$> v .: "embed_url"
+    GiphyItem <$> v .: "embed_url" -- how does it know to turn "embed_url" into embedUrl?
            <*> v .: "slug"
  parseJSON _ = mzero
 
@@ -34,6 +34,8 @@ newtype GiphyList = GiphyList [GiphyItem] deriving Show
 instance FromJSON GiphyList where
     parseJSON (Object o) = GiphyList <$> o .: "data" -- I have no idea why this works and various other things I tried don't
     parseJSON _ = mzero
+
+-- what is <$>?
 
 -- TODO: make this return an IO of GiphyList or something like that, not just assume to print it
 -- TODO: print this out more nicely
