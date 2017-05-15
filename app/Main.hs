@@ -12,7 +12,6 @@ import Lib
 
 
 main :: IO ()
-main = do
-   putStrLn "enter a search term and hit enter"
-   searchterms <- getLine
-   giphySearch searchterms
+main =
+   putStrLn "enter a search term and hit enter" >>
+   getLine >>= giphySearch
