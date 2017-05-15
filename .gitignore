@@ -2,3 +2,4 @@
 .stack-work/
 .ideaHaskellLib/
 simple.iml
+out/
