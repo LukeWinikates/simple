@@ -11,16 +11,32 @@ import Control.Exception (throwIO)
 import Network.HTTP.Req
 import Data.Aeson
 import Data.Monoid
+import Control.Monad (mzero)
 
 instance MonadHttp IO where
   handleHttpException = throwIO
 
--- giphy's json response payload will be something like "{data: [{"id": "asdfasdfa", "url": ""}]}"
--- maybe we can pipe curl a thing down and shell out to the browser to open whatever the cat gif is
 -- as a bonus, maybe we can use the random stuff to select a random cat gif from the list
 
+data GiphyItem = GiphyItem {
+  embedUrl :: String
+  , slug :: String
+} deriving Show
 
--- TODO: parse JSON, get the urls for each gif as a data structure (instead of printing the whole thing)
+instance FromJSON GiphyItem where
+ parseJSON (Object v) =
+    GiphyItem <$> v .: "embed_url"
+           <*> v .: "slug"
+ parseJSON _ = mzero
+
+newtype GiphyList = GiphyList [GiphyItem] deriving Show
+
+instance FromJSON GiphyList where
+    parseJSON (Object o) = GiphyList <$> o .: "data" -- I have no idea why this works and various other things I tried don't
+    parseJSON _ = mzero
+
+-- TODO: make this return an IO of GiphyList or something like that, not just assume to print it
+-- TODO: print this out more nicely
 giphySearch :: String -> IO ()
 giphySearch searchterms =
   let options = ("q" =: (searchterms :: String) <>
@@ -31,7 +47,9 @@ giphySearch searchterms =
           NoReqBody
           jsonResponse -- still expecting json, not parsing anything for now
           options
-        print (responseBody res :: Value)
+        print (responseBody res :: GiphyList) -- the key here was that this read `Value` before,
+        -- but Value is just an instance of of `FromJSON`,
+        -- and you can provide your own more specific type when accessing the responseBody
 
 
 
