@@ -11,8 +11,16 @@ import Data.Aeson
 import Lib
 import System.Process (callCommand)
 
+charToNumber :: String -> Int
+charToNumber c = read c :: Int
+
+nth :: Int -> [a] -> a
+nth n list = head $ drop (n-1) list
+
 main :: IO ()
 main =
    putStrLn "enter a search term and hit enter" >>
    getLine >>= giphySearch >>= \(Lib.GiphyList giphies) ->
-   callCommand $ "open " ++ (embedUrl (head giphies))
+   print giphies >>
+   getLine >>= \l -> return (charToNumber l) >>= \number ->
+   callCommand $ "open " ++ (embedUrl (nth number giphies))
