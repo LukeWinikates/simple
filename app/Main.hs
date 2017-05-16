@@ -17,14 +17,18 @@ charToNumber c = read c :: Int
 nth :: Int -> [a] -> a
 nth n list = head $ drop (n-1) list
 
--- TODO: add numbers
--- TODO:
 tabularize :: [GiphyItem] -> Box
 tabularize items =
-  foldl
-    (B.//)
-    (B.text "SLUG")
-    (map (B.text . slug) items)
+  (B.<+>)
+    (foldl
+      (B.//)
+      (B.text "#")
+      (map (B.text . show) [1..(length items)]))
+
+    (foldl
+      (B.//)
+      (B.text "Giphy Slug")
+      (map (B.text . slug) items))
 
 main :: IO ()
 main =
