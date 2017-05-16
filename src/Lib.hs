@@ -41,14 +41,11 @@ instance FromJSON GiphyList where
 -- TODO: print a table of the results
 giphySearch :: String -> IO GiphyList
 giphySearch searchterms =
-  let options = ("q" =: (searchterms :: String) <>
+  let url = (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
+      options = ("q" =: (searchterms :: String) <>
                           "api_key" =: ("dc6zaTOxFJmzC"::String)) in
-      req GET
-        (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
-        NoReqBody
-        jsonResponse
-        options >>=
-        \res -> return (responseBody res :: GiphyList)
+        req GET url NoReqBody jsonResponse options >>= \res ->
+        return (responseBody res :: GiphyList)
         -- I feel like this is really backwards from how I'd write this in other languages. In pseudojava, I'd do:
         -- req(GET, etc...).map(res => res.responseBody<GiphyList>()).
         -- but it seems like applying a function to a monad in haskell expects
