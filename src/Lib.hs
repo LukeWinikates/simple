@@ -37,21 +37,23 @@ instance FromJSON GiphyList where
 
 -- what is <$>?
 
--- TODO: make this return an IO of GiphyList or something like that, not just assume to print it
 -- TODO: print this out more nicely
-giphySearch :: String -> IO ()
+-- TODO: print a table of the results
+giphySearch :: String -> IO GiphyList
 giphySearch searchterms =
   let options = ("q" =: (searchterms :: String) <>
                           "api_key" =: ("dc6zaTOxFJmzC"::String)) in
-      do
-        res <- req GET
-          (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
-          NoReqBody
-          jsonResponse -- still expecting json, not parsing anything for now
-          options
-        print (responseBody res :: GiphyList) -- the key here was that this read `Value` before,
-        -- but Value is just an instance of of `FromJSON`,
-        -- and you can provide your own more specific type when accessing the responseBody
+      req GET
+        (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
+        NoReqBody
+        jsonResponse
+        options >>=
+        \res -> return (responseBody res :: GiphyList)
+        -- I feel like this is really backwards from how I'd write this in other languages. In pseudojava, I'd do:
+        -- req(GET, etc...).map(res => res.responseBody<GiphyList>()).
+        -- but it seems like applying a function to a monad in haskell expects
+        -- the mapped function itself to return a monad, so that you have to
+        -- `return` in order to... monadetize the function call
 
 
 

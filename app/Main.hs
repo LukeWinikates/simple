@@ -14,4 +14,4 @@ import Lib
 main :: IO ()
 main =
    putStrLn "enter a search term and hit enter" >>
-   getLine >>= giphySearch
+   getLine >>= giphySearch >>= print
