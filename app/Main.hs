@@ -2,17 +2,14 @@
 
 module Main (main) where
 
-import Control.Exception (throwIO)
-import Network.HTTP.Req
-import Data.Aeson
 import Text.Read (readMaybe)
 import Lib
-import System.Process (callCommand)
+import System.Process as P (callCommand)
 import Text.PrettyPrint.Boxes as B
 import System.Random
 
 charToNumber :: String -> Maybe Int
-charToNumber c = (readMaybe c :: Maybe Int)
+charToNumber c = readMaybe c :: Maybe Int
 
 nth :: Int -> [a] -> a
 nth n list = head $ drop (n-1) list
@@ -42,4 +39,4 @@ main =
       case maybeNumber of
           Just number -> return number
           Nothing -> return randomNumber) >>= \n ->
-   callCommand $ "open " ++ embedUrl (nth n giphies)
+   P.callCommand $ "open " ++ embedUrl (nth n giphies)
