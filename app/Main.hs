@@ -27,6 +27,14 @@ tabularize items =
       (B.text "Giphy Slug")
       (map (B.text . slug) items))
 
+randomNumber :: StdGen -> Int -> Int
+randomNumber gen len =
+    let (number, _) = randomR (1, len) gen in number
+
+orElse :: Maybe a -> a -> a
+orElse (Just value) _ = value
+orElse Nothing altValue = altValue
+
 main :: IO ()
 main =
    getStdGen >>= \gen ->
@@ -34,9 +42,6 @@ main =
    getLine >>= giphySearch >>= \(Lib.GiphyList giphies) ->
    printBox (tabularize giphies) >>
    putStrLn "which one would you like to open? (type a number and press <enter>, or just press enter to get a random gif)" >>
-   getLine >>= \l -> return (charToNumber l) >>= (\maybeNumber ->
-    let (randomNumber, _) = (randomR (1, length giphies) gen) in
-      case maybeNumber of
-          Just number -> return number
-          Nothing -> return randomNumber) >>= \n ->
+   getLine >>= (\l ->
+      return (orElse (charToNumber l) (randomNumber gen (length giphies)))) >>= \n ->
    P.callCommand $ "open " ++ embedUrl (nth n giphies)
