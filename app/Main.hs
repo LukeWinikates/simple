@@ -38,7 +38,7 @@ main =
    printBox (tabularize giphies) >>
    putStrLn "which one would you like to open? (type a number and press <enter>, or just press enter to get a random gif)" >>
    getLine >>= \l -> return (charToNumber l) >>= (\maybeNumber ->
-    let (randomNumber, _) = (randomR (1, (length giphies)) gen) in
+    let (randomNumber, _) = (randomR (1, length giphies) gen) in
       case maybeNumber of
           Just number -> return number
           Nothing -> return randomNumber) >>= \n ->
