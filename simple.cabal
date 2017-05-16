@@ -21,6 +21,7 @@ library
                     , aeson
                     , process
                     , boxes
+                    , random
   default-language:    Haskell2010
 
 executable simple-exe
@@ -33,6 +34,7 @@ executable simple-exe
                      , aeson
                     , process
                     , boxes
+                    , random
   default-language:    Haskell2010
 
 test-suite simple-test
