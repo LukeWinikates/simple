@@ -1,6 +1,4 @@
 {-# LANGUAGE OverloadedStrings    #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
--- ??? did not google
 
 module Main (main) where
 
