@@ -9,9 +9,10 @@ import Control.Exception (throwIO)
 import Network.HTTP.Req
 import Data.Aeson
 import Lib
-
+import System.Process (callCommand)
 
 main :: IO ()
 main =
    putStrLn "enter a search term and hit enter" >>
-   getLine >>= giphySearch >>= print
+   getLine >>= giphySearch >>= \(Lib.GiphyList giphies) ->
+   callCommand $ "open " ++ (embedUrl (head giphies))

@@ -3,7 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Lib
-    ( giphySearch
+    ( giphySearch, embedUrl, GiphyList(..), GiphyItem(..) -- had to export a ton of these so that destructuring with the GiphyList data constructor could work
     ) where
 
 import Control.Exception (throwIO)
@@ -46,11 +46,6 @@ giphySearch searchterms =
                           "api_key" =: ("dc6zaTOxFJmzC"::String)) in
         req GET url NoReqBody jsonResponse options >>= \res ->
         return (responseBody res :: GiphyList)
-        -- I feel like this is really backwards from how I'd write this in other languages. In pseudojava, I'd do:
-        -- req(GET, etc...).map(res => res.responseBody<GiphyList>()).
-        -- but it seems like applying a function to a monad in haskell expects
-        -- the mapped function itself to return a monad, so that you have to
-        -- `return` in order to... monadetize the function call
 
 
 
