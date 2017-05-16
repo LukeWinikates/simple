@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings    #-}
---https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/guide-to-ghc-extensions/basic-syntax-extensions#overloadedstrings
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -- ??? did not google
 
@@ -17,10 +16,17 @@ charToNumber c = read c :: Int
 nth :: Int -> [a] -> a
 nth n list = head $ drop (n-1) list
 
+-- TODO: print giphies as a table
+
+tabularize :: [GiphyItem] -> String
+tabularize items =
+  foldl
+
 main :: IO ()
 main =
    putStrLn "enter a search term and hit enter" >>
    getLine >>= giphySearch >>= \(Lib.GiphyList giphies) ->
    print giphies >>
-   getLine >>= \l -> return (charToNumber l) >>= \number ->
-   callCommand $ "open " ++ (embedUrl (nth number giphies))
+   getLine >>= \l -> (\ number ->
+    callCommand $ "open " ++ embedUrl (nth number giphies))
+   (charToNumber l)

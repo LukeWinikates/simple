@@ -1,9 +1,8 @@
 
 {-# LANGUAGE OverloadedStrings    #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Lib
-    ( giphySearch, embedUrl, GiphyList(..), GiphyItem(..) -- had to export a ton of these so that destructuring with the GiphyList data constructor could work
+    ( giphySearch, GiphyList(..), GiphyItem(..) -- had to export a ton of these so that destructuring with the GiphyList data constructor could work
     ) where
 
 import Control.Exception (throwIO)
@@ -36,9 +35,6 @@ instance FromJSON GiphyList where
     parseJSON _ = mzero
 
 -- what is <$>?
-
--- TODO: print this out more nicely
--- TODO: print a table of the results
 giphySearch :: String -> IO GiphyList
 giphySearch searchterms =
   let url = (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
