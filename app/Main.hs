@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings    #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Main (main) where
 
@@ -7,6 +8,8 @@ import Lib
 import System.Process as P (callCommand)
 import Text.PrettyPrint.Boxes as B
 import System.Random
+import Network.HTTP.Req (MonadHttp, handleHttpException)
+import Control.Exception (throwIO)
 
 charToNumber :: String -> Maybe Int
 charToNumber c = readMaybe c :: Maybe Int
@@ -42,6 +45,9 @@ pickAGiphy giphies = do
   let randomSelection = randomNumber gen (length giphies)
       n = userSelectedNumber `orElse` randomSelection
     in return (nth n giphies)
+
+instance MonadHttp IO where
+  handleHttpException = throwIO
 
 main :: IO ()
 main =
