@@ -22,7 +22,7 @@ data GiphyItem = GiphyItem {
 
 instance FromJSON GiphyItem where
  parseJSON (Object v) =
-    GiphyItem <$> v .: "embed_url" -- how does it know to turn "embed_url" into embedUrl?
+    GiphyItem <$> v .: "embed_url"
            <*> v .: "slug"
  parseJSON _ = mzero
 
