@@ -32,6 +32,9 @@ instance FromJSON GiphyList where
     parseJSON (Object o) = GiphyList <$> o .: "data"
     parseJSON _ = mzero
 
+-- maybe this can be refactored to not depend on IO and depend on MonadHttp instead?
+-- or on one of those  => declaration things
+-- that seem to be involved for type signatures that relate to monads
 giphySearch :: String -> IO GiphyList
 giphySearch searchterms =
   let url = (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
