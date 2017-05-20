@@ -32,7 +32,6 @@ instance FromJSON GiphyList where
     parseJSON (Object o) = GiphyList <$> o .: "data"
     parseJSON _ = mzero
 
--- what is <$>?
 giphySearch :: String -> IO GiphyList
 giphySearch searchterms =
   let url = (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
