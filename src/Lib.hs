@@ -10,7 +10,7 @@ import Control.Exception (throwIO)
 import Network.HTTP.Req
 import Data.Aeson
 import Data.Monoid
-import Control.Monad (mzero) -- what is mzero?
+import Control.Monad (mzero)
 
 instance MonadHttp IO where
   handleHttpException = throwIO
