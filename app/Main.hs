@@ -35,13 +35,20 @@ orElse :: Maybe a -> a -> a
 orElse (Just value) _ = value
 orElse Nothing altValue = altValue
 
+pickAGiphy :: [GiphyItem] -> IO GiphyItem
+pickAGiphy giphies = do
+  gen <- getStdGen
+  userSelectedNumber <- fmap charToNumber getLine
+  let randomSelection = randomNumber gen (length giphies)
+      n = userSelectedNumber `orElse` randomSelection
+    in return (nth n giphies)
+
 main :: IO ()
 main =
-   getStdGen >>= \gen ->
    putStrLn "enter a search term and press <enter>" >>
    getLine >>= giphySearch >>= \(Lib.GiphyList giphies) ->
    printBox (tabularize giphies) >>
    putStrLn "which one would you like to open? (type a number and press <enter>, or just press enter to get a random gif)" >>
-   getLine >>= (\l ->
-      return (orElse (charToNumber l) (randomNumber gen (length giphies)))) >>= \n ->
-   P.callCommand $ "open " ++ embedUrl (nth n giphies)
+   pickAGiphy giphies >>= \giphy ->
+   P.callCommand $ "open " ++ embedUrl giphy
+

@@ -15,8 +15,6 @@ import Control.Monad (mzero) -- what is mzero?
 instance MonadHttp IO where
   handleHttpException = throwIO
 
--- as a bonus, maybe we can use the random stuff to select a random cat gif from the list
-
 data GiphyItem = GiphyItem {
   embedUrl :: String
   , slug :: String
