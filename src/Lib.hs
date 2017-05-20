@@ -29,7 +29,7 @@ instance FromJSON GiphyItem where
 newtype GiphyList = GiphyList [GiphyItem] deriving Show
 
 instance FromJSON GiphyList where
-    parseJSON (Object o) = GiphyList <$> o .: "data" -- I have no idea why this works and various other things I tried don't
+    parseJSON (Object o) = GiphyList <$> o .: "data"
     parseJSON _ = mzero
 
 -- what is <$>?
