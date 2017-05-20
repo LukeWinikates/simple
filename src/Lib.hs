@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 
 module Lib
-    ( giphySearch, GiphyList(..), GiphyItem(..) -- had to export a ton of these so that destructuring with the GiphyList data constructor could work
+    ( giphySearch, GiphyList(..), GiphyItem(..)
     ) where
 
 import Control.Exception (throwIO)
