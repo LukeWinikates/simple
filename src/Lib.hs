@@ -32,8 +32,4 @@ giphySearch searchterms =
   let url = (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
       options = ("q" =: (searchterms :: String) <>
                           "api_key" =: ("dc6zaTOxFJmzC"::String)) in
-        req GET url NoReqBody jsonResponse options >>= \res ->
-        return (responseBody res :: GiphyList)
-
-
-
+      responseBody <$> req GET url NoReqBody jsonResponse options
