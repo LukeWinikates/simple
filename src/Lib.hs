@@ -27,9 +27,12 @@ instance FromJSON GiphyList where
     parseJSON (Object o) = GiphyList <$> o .: "data"
     parseJSON _ = mzero
 
+(|>) :: Functor f => f a -> (a -> b) -> f b
+a |> b = fmap b a
+
 giphySearch :: MonadHttp m => String -> m GiphyList
 giphySearch searchterms =
   let url = (https "api.giphy.com" /: "v1" /:"gifs" /: "search")
       options = ("q" =: (searchterms :: String) <>
                           "api_key" =: ("dc6zaTOxFJmzC"::String)) in
-      responseBody <$> req GET url NoReqBody jsonResponse options
+      req GET url NoReqBody jsonResponse options |> responseBody
