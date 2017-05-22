@@ -13,7 +13,7 @@ import Control.Monad (mzero)
 data GiphyItem = GiphyItem {
   embedUrl :: String
   , slug :: String
-} deriving Show
+} deriving (Show, Eq)
 
 instance FromJSON GiphyItem where
  parseJSON (Object v) =
