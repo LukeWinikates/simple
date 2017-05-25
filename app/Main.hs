@@ -50,7 +50,6 @@ pickAGiphy giphies gen = do
 
 keepPicking :: [GiphyItem] -> StdGen -> IO ()
 keepPicking giphies gen =
-   printBox (tabularize giphies) >>
    putStrLn "which one would you like to open? (type a number and press <enter>, or just press enter to get a random gif)" >>
    pickAGiphy giphies gen >>= \(giphy, newGen) ->
    P.callCommand ("open " ++ embedUrl giphy) >>
@@ -61,8 +60,9 @@ instance MonadHttp IO where
 
 -- todo: only print the table once (or offer an option to print it again)
 main :: IO ()
-main =
-   putStrLn "enter a search term and press <enter>" >>
-   getLine >>= giphySearch >>= \(Lib.GiphyList giphies) ->
+main = do
+   putStrLn "enter a search term and press <enter>"
+   (Lib.GiphyList giphies) <- getLine >>= giphySearch
+   printBox (tabularize giphies)
    keepPicking giphies =<< getStdGen
 
