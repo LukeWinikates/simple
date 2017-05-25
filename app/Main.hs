@@ -48,17 +48,24 @@ pickAGiphy giphies gen = do
   let (n, g) = fmap (flip (,) gen) userSelectedNumber `orElse` randomNumber gen (length giphies)
     in return (nth n giphies, g)
 
+shellCommandToOpen :: GiphyItem -> String
+shellCommandToOpen giphy = "open " ++ embedUrl giphy
+
 keepPicking :: [GiphyItem] -> StdGen -> IO ()
 keepPicking giphies gen =
    putStrLn "which one would you like to open? (type a number and press <enter>, or just press enter to get a random gif)" >>
    pickAGiphy giphies gen >>= \(giphy, newGen) ->
-   P.callCommand ("open " ++ embedUrl giphy) >>
+   P.callCommand (shellCommandToOpen giphy) >>
    keepPicking giphies newGen
 
 instance MonadHttp IO where
   handleHttpException = throwIO
 
--- todo: only print the table once (or offer an option to print it again)
+-- todo: more helpful user input, e.g.:
+-- <back> to search again
+-- <1-25> to select an image
+-- <r> for random
+-- <t> to print the table again
 main :: IO ()
 main = do
    putStrLn "enter a search term and press <enter>"
