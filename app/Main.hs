@@ -10,6 +10,7 @@ import System.Process as P (callCommand)
 import Text.PrettyPrint.Boxes as B
 import System.Random
 import System.Exit
+import Control.Monad ((>=>))
 import Network.HTTP.Req (MonadHttp, handleHttpException)
 import Control.Exception (throwIO)
 
@@ -38,15 +39,14 @@ shellCommandToOpen giphy = "open " ++ embedUrl giphy
 
 keepPicking :: Context -> IO ()
 keepPicking context =
-   putStrLn "what would you like to do?" >>
-   putStrLn " 1-25: open an random gif from this list in the browser" >>
-   putStrLn " r: open an random gif from this list in the browser" >>
-   putStrLn " s: start a new search" >>
-   putStrLn " t: print the list of giphies again" >>
-   putStrLn " q: quit" >>
-   (getLine |> userInputToCommand) >>= \command ->
-   perform context command >>= \context ->
-   keepPicking context
+  putStrLn "what would you like to do?" >>
+  putStrLn " 1-25: open an random gif from this list in the browser" >>
+  putStrLn " r: open an random gif from this list in the browser" >>
+  putStrLn " s: start a new search" >>
+  putStrLn " t: print the list of giphies again" >>
+  putStrLn " q: quit" >>
+  (getLine |> userInputToCommand) >>=
+  (perform context >=> keepPicking)
 
 instance MonadHttp IO where
   handleHttpException = throwIO
@@ -99,6 +99,8 @@ perform context PickRandom =
     P.callCommand (shellCommandToOpen $ nth n (giphies context)) >>
     return context { stdGen = g }
 
+-- TODO: extract more functions, possibly separate the perform functions and
+--        the function that returns the modified context
 main :: IO ()
 main = do
    putStrLn "enter a search term and press <enter>"
