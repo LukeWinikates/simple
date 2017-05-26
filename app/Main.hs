@@ -9,11 +9,9 @@ import Lib
 import System.Process as P (callCommand)
 import Text.PrettyPrint.Boxes as B
 import System.Random
+import System.Exit
 import Network.HTTP.Req (MonadHttp, handleHttpException)
 import Control.Exception (throwIO)
-
-charToNumber :: String -> Maybe Int
-charToNumber c = readMaybe c :: Maybe Int
 
 nth :: Int -> [a] -> a
 nth n list = head $ drop (n-1) list
@@ -35,41 +33,77 @@ randomNumber :: StdGen -> Int -> (Int, StdGen)
 randomNumber gen len =
     randomR (1, len) gen
 
-orElse :: Maybe a -> a -> a
-orElse (Just value) _ = value
-orElse Nothing altValue = altValue
-
--- todo: the flip on the tuple construction is maybe too clever
--- the let line is maybe too long
--- I wonder if pickAGiphy could be a little more linear, e.g. with the Maybe function
-pickAGiphy :: [GiphyItem] -> StdGen -> IO (GiphyItem, StdGen)
-pickAGiphy giphies gen = do
-  userSelectedNumber <- fmap charToNumber getLine
-  let (n, g) = fmap (flip (,) gen) userSelectedNumber `orElse` randomNumber gen (length giphies)
-    in return (nth n giphies, g)
-
 shellCommandToOpen :: GiphyItem -> String
 shellCommandToOpen giphy = "open " ++ embedUrl giphy
 
-keepPicking :: [GiphyItem] -> StdGen -> IO ()
-keepPicking giphies gen =
-   putStrLn "which one would you like to open? (type a number and press <enter>, or just press enter to get a random gif)" >>
-   pickAGiphy giphies gen >>= \(giphy, newGen) ->
-   P.callCommand (shellCommandToOpen giphy) >>
-   keepPicking giphies newGen
+keepPicking :: Context -> IO ()
+keepPicking context =
+   putStrLn "what would you like to do?" >>
+   putStrLn " 1-25: open an random gif from this list in the browser" >>
+   putStrLn " r: open an random gif from this list in the browser" >>
+   putStrLn " s: start a new search" >>
+   putStrLn " t: print the list of giphies again" >>
+   putStrLn " q: quit" >>
+   (getLine |> userInputToCommand) >>= \command ->
+   perform context command >>= \context ->
+   keepPicking context
 
 instance MonadHttp IO where
   handleHttpException = throwIO
 
--- todo: more helpful user input, e.g.:
--- <back> to search again
--- <1-25> to select an image
--- <r> for random
--- <t> to print the table again
+data UserCommand = Pick Int | PickRandom | PrintTable | NewSearch | Quit | Wat
+
+data Context = Context {
+  stdGen :: StdGen,
+  giphies :: [GiphyItem]
+} deriving Show
+
+userInputToCommand :: String -> UserCommand
+userInputToCommand s =
+  case s of
+    "r" -> PickRandom
+    "" -> PickRandom
+    "s" -> NewSearch
+    "p" -> PrintTable
+    "q" -> Quit
+    _ -> case (readMaybe s :: Maybe Int) of
+      Just n -> Pick n
+      Nothing -> Wat
+
+perform :: Context -> UserCommand -> IO Context
+perform context (Pick n) =
+  P.callCommand (shellCommandToOpen $ nth n (giphies context)) >>
+  return context
+
+perform context NewSearch =
+  putStrLn "enter a search term and press <enter>" >>
+  getLine >>= giphySearch >>= \(Lib.GiphyList newGiphies) ->
+  printBox (tabularize (giphies context)) >>
+  return context { giphies = newGiphies }
+
+perform context PrintTable =
+  printBox (tabularize (giphies context)) >>
+  return context
+
+perform context Wat =
+  putStrLn "unrecognized input. Hit Ctrl + C to exit" >>
+  return context
+
+perform _ Quit =
+  putStrLn "exiting..." >>
+  exitSuccess
+
+perform context PickRandom =
+  let Context { stdGen = gen, giphies = gs} = context
+      (n,g) = randomNumber gen (length gs) in
+    P.callCommand (shellCommandToOpen $ nth n (giphies context)) >>
+    return context { stdGen = g }
+
 main :: IO ()
 main = do
    putStrLn "enter a search term and press <enter>"
-   (Lib.GiphyList giphies) <- getLine >>= giphySearch
-   printBox (tabularize giphies)
-   keepPicking giphies =<< getStdGen
+   (Lib.GiphyList g) <- getLine >>= giphySearch
+   printBox (tabularize g)
+   gen <- getStdGen
+   keepPicking Context { giphies = g, stdGen = gen }
 

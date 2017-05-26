@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 
 module Lib
-    ( giphySearch, GiphyList(..), GiphyItem(..)
+    ( giphySearch, GiphyList(..), GiphyItem(..), (|>)
     ) where
 
 import Network.HTTP.Req
